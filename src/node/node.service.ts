@@ -1,26 +1,35 @@
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { CreateNodeDto } from './dto/create-node.dto';
 import { UpdateNodeDto } from './dto/update-node.dto';
+import { Node, NodeDocument } from 'src/schemas/node.schema';
 
 @Injectable()
 export class NodeService {
+  constructor(
+    @InjectModel(Node.name)
+    private nodeModel: Model<NodeDocument>,
+  ) {}
+
   create(createNodeDto: CreateNodeDto) {
-    return 'This action adds a new node';
+    const newNode = new this.nodeModel(createNodeDto);
+    return newNode.save();
   }
 
-  findAll() {
-    return `This action returns all node`;
+  async findAll() {
+    return await this.nodeModel.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} node`;
+  async findOne(id: string) {
+    return await this.nodeModel.findById(id);
   }
 
-  update(id: number, updateNodeDto: UpdateNodeDto) {
-    return `This action updates a #${id} node`;
+  async update(id: string, updateNodeDto: UpdateNodeDto) {
+    return await this.nodeModel.findByIdAndUpdate(id, updateNodeDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} node`;
+  async remove(id: number) {
+    return await this.nodeModel.findByIdAndRemove(id);
   }
 }
